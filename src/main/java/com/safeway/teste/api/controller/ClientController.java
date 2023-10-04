@@ -36,6 +36,7 @@ public class ClientController {
         return this.clientRepository.findAll();
     }
 
+
     @PostMapping
     public ClientResponseDto save(@RequestBody @Valid ClientInputDto clientDto) {
         return this.clientService.save(clientDto);

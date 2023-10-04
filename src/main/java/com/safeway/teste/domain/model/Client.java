@@ -40,4 +40,8 @@ public class Client {
     public Client(Long clientId) {
         this.id = clientId;
     }
+
+    public void addCompanie(Company company) {
+        this.companies.add(company);
+    }
 }
