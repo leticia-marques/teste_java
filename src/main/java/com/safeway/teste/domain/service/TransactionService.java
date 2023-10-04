@@ -5,22 +5,28 @@ import com.safeway.teste.domain.dto.transaction.TransactionInputDto;
 import com.safeway.teste.domain.dto.transaction.TransactionListDto;
 import com.safeway.teste.domain.dto.transaction.TransactionResponseDto;
 import com.safeway.teste.domain.enumarated.TransactionType;
+import com.safeway.teste.domain.exception.BusinessException;
+import com.safeway.teste.domain.exception.EntityNotFoundException;
 import com.safeway.teste.domain.exception.TransactionNotFoundException;
 import com.safeway.teste.domain.model.Client;
 import com.safeway.teste.domain.model.Company;
 import com.safeway.teste.domain.model.Transaction;
 import com.safeway.teste.domain.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TransactionService {
 
+    private static final BigDecimal TRANSACTION_FEE = new BigDecimal("0.05");
     private CompanyService companyService;
 
     private ClientService clientService;
@@ -34,14 +40,13 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
-
-
     @Transactional
     public TransactionResponseDto deposit(TransactionInputDto transactionDto) {
         Company company = this.companyService.getById(new Company(transactionDto.companyId()));
         Client client =  this.clientService.getById(new Client(transactionDto.clientId()));
 
         Transaction transaction = new Transaction(client, company, transactionDto.value(), TransactionType.DEPOSIT);
+        transaction = this.discountFee(transaction);
         transaction = this.transactionRepository.save(transaction);
         return new TransactionResponseDto(transaction);
     }
@@ -72,6 +77,7 @@ public class TransactionService {
         Client client =  this.clientService.getById(new Client(transactionDto.clientId()));
 
         Transaction transaction = new Transaction(client, company, transactionDto.value(), TransactionType.WITHDRAW);
+        this.validateWithDraw(transaction);
         transaction = this.transactionRepository.save(transaction);
         return new TransactionResponseDto(transaction);
     }
@@ -82,4 +88,36 @@ public class TransactionService {
     }
 
 
+    public Optional<Transaction> getLastTransactionByClientId(Long clientId, Long companyId) {
+        return this.transactionRepository.findLastTransactionForClientId(clientId, companyId);
+    }
+
+    @Transactional
+    public Transaction discountFee(Transaction transaction) {
+        Optional<Transaction> lastTransaction  = this.getLastTransactionByClientId(transaction.getClient().getId(), transaction.getCompany().getId());
+        BigDecimal depositValue = transaction.getValue();
+        transaction.getCompany().addBalance(depositValue);
+        transaction.getClient().addCompanie(transaction.getCompany());
+        if (lastTransaction.isPresent()){
+            transaction.addTotalBalance(lastTransaction.get().getTotalBalance());
+        }
+        transaction.subtractFee(TRANSACTION_FEE);
+        return transaction;
+    }
+
+    public void validateWithDraw(Transaction transaction) {
+        //TODO subtrair o valor do saque do total da empresa
+        Optional<Transaction> lastTransaction  = this.getLastTransactionByClientId(transaction.getClient().getId(), transaction.getCompany().getId());
+        if (lastTransaction.isPresent()) {
+            BigDecimal valueFee = transaction.getValue().multiply(TRANSACTION_FEE);
+            BigDecimal totalValueWithFee = transaction.getValue().add(valueFee);
+            if (lastTransaction.get().getTotalBalance().compareTo(totalValueWithFee) < 0) {
+                throw new BusinessException("Not enough balance");
+            }
+        }
+        else {
+            throw new TransactionNotFoundException("No deposits made yet");
+        }
+
+    }
 }
