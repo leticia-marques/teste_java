@@ -25,7 +25,7 @@ public class Company {
     private Long id;
 
     @CNPJ
-    private String CNPJ;
+    private String cnpj;
 
     private String name;
 
@@ -34,20 +34,26 @@ public class Company {
     @ManyToMany(mappedBy = "companies")
     private Set<Client> clients = new HashSet<>();
 
-//    @OneToMany
-//    private List<Transaction> transactions = new ArrayList<>();
+    @OneToMany(mappedBy = "company", cascade = CascadeType.REMOVE)
 
-    public Company(String CNPJ, String name) {
-        this.CNPJ = CNPJ;
+    private List<Transaction> transactions = new ArrayList<>();
+
+    public Company(String cnpj, String name) {
+        this.cnpj = cnpj;
         this.name = name;
     }
 
     public Company(CompanyInputDto companyDto) {
-        this.CNPJ = companyDto.CNPJ();
+        this.cnpj = companyDto.cnpj();
         this.name = companyDto.name();
     }
 
     public Company(Long companyId) {
         this.id = companyId;
+    }
+
+    public void addBalance(BigDecimal totalValue) {
+        BigDecimal totalQualquer = this.balance.add(totalValue);
+        this.balance = this.balance.add(totalQualquer);
     }
 }
