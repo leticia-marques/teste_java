@@ -66,6 +66,7 @@ public class TransactionService {
         this.transactionRepository.delete(transaction);
     }
 
+    @Transactional
     public TransactionResponseDto withdraw(TransactionInputDto transactionDto) {
         Company company = this.companyService.getById(new Company(transactionDto.companyId()));
         Client client =  this.clientService.getById(new Client(transactionDto.clientId()));
@@ -79,4 +80,6 @@ public class TransactionService {
         Page<Transaction> page = this.transactionRepository.findAll(pageable);
         return page.map(transaction -> new TransactionListDto(transaction));
     }
+
+
 }
