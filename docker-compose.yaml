@@ -1,7 +1,7 @@
 version: '3.6'
 
 services:
- database:
+  database:
     image: postgres:10.16
     restart: always
     environment:
@@ -12,11 +12,9 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    #networks:
-     # - app
 
 volumes:
   pgdata:
-networks:
-  app:
+
+    
 

@@ -3,7 +3,7 @@ package com.safeway.teste.domain.service;
 import com.safeway.teste.domain.dto.client.ClientInputDto;
 import com.safeway.teste.domain.dto.client.ClientListDto;
 import com.safeway.teste.domain.dto.client.ClientResponseDto;
-import com.safeway.teste.domain.exceptions.ClientNotFoundException;
+import com.safeway.teste.domain.exception.ClientNotFoundException;
 import com.safeway.teste.domain.model.Client;
 import com.safeway.teste.domain.repository.ClientRepository;
 import jakarta.transaction.Transactional;

@@ -1,4 +1,4 @@
-package com.safeway.teste.domain.exceptions;
+package com.safeway.teste.domain.exception;
 
 public class CompanyNotFoundException extends EntityNotFoundException{
 

@@ -6,6 +6,10 @@ import lombok.*;
 import org.hibernate.validator.constraints.br.CNPJ;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -13,7 +17,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
-@Table
+@Table(name = "company")
 public class Company {
 
     @Id
@@ -26,6 +30,12 @@ public class Company {
     private String name;
 
     private BigDecimal balance = BigDecimal.ZERO;
+
+    @ManyToMany(mappedBy = "companies")
+    private Set<Client> clients = new HashSet<>();
+
+//    @OneToMany
+//    private List<Transaction> transactions = new ArrayList<>();
 
     public Company(String CNPJ, String name) {
         this.CNPJ = CNPJ;

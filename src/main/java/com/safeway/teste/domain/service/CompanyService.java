@@ -1,10 +1,9 @@
 package com.safeway.teste.domain.service;
 
-import com.safeway.teste.domain.dto.client.ClientResponseDto;
 import com.safeway.teste.domain.dto.company.CompanyInputDto;
 import com.safeway.teste.domain.dto.company.CompanyListDto;
 import com.safeway.teste.domain.dto.company.CompanyResponseDto;
-import com.safeway.teste.domain.exceptions.CompanyNotFoundException;
+import com.safeway.teste.domain.exception.CompanyNotFoundException;
 import com.safeway.teste.domain.model.Company;
 import com.safeway.teste.domain.repository.CompanyRepository;
 import jakarta.transaction.Transactional;
@@ -12,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CompanyService {
