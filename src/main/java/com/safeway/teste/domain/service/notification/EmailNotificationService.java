@@ -16,7 +16,7 @@ import com.sendgrid.helpers.mail.objects.Content;
 import javax.swing.text.AbstractDocument;
 import java.io.IOException;
 
-//@Service
+@Service
 public class EmailNotificationService implements NotificationService{
 
 
@@ -26,8 +26,7 @@ public class EmailNotificationService implements NotificationService{
     @Value("${safeway.teste.notification.api-key}")
     private String apiKey;
 
-    //TODO configurar recebimento de email do cliente na criação de clienteInputDto
-    // TODO TESTE refatoração melhorar documentação README DOCKER e docker-compose
+   
     @Override
     public void notification(Message message) {
         EmailDto newEmail =  new EmailDto(message.client().getName(), message.transactionValue(),
