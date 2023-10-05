@@ -38,20 +38,18 @@ public class TransactionService {
 
     private TransactionRepository transactionRepository;
 
-    private NotificationService notificationService;
+    private List<NotificationService> notificationServices;
 
     @Autowired
     public TransactionService(CompanyService companyService, ClientService clientService,
-                              TransactionRepository transactionRepository, NotificationService notificationService) {
+                              TransactionRepository transactionRepository, List<NotificationService> notificationServices) {
         this.companyService = companyService;
         this.clientService = clientService;
         this.transactionRepository = transactionRepository;
-        this.notificationService = notificationService;
+        this.notificationServices =  notificationServices;
     }
 
-    public void sendWebHook() {
 
-    }
     @Transactional
     public TransactionResponseDto deposit(TransactionInputDto transactionDto) {
         Company company = this.companyService.getById(new Company(transactionDto.companyId()));
@@ -60,7 +58,9 @@ public class TransactionService {
         Transaction transaction = new Transaction(client, company, transactionDto.value(), TransactionType.DEPOSIT);
         transaction = this.discountFee(transaction);
         transaction = this.transactionRepository.save(transaction);
-        this.notificationService.notification(new Message("deposito", transactionDto.value(), company, client));
+        for (NotificationService notification: this.notificationServices) {
+            notification.notification(new Message("deposito", transactionDto.value(), company, client));
+        }
         return new TransactionResponseDto(transaction);
     }
 
@@ -93,7 +93,9 @@ public class TransactionService {
         this.validateWithDraw(transaction);
         company.subtractBalance(transaction.getValue().subtract(transactionDto.value().multiply(TRANSACTION_FEE)));
         transaction = this.transactionRepository.save(transaction);
-        this.notificationService.notification(new Message("saque", transactionDto.value(), company, client));
+        for (NotificationService notification: this.notificationServices) {
+            notification.notification(new Message("saque", transactionDto.value(), company, client));
+        }
         return new TransactionResponseDto(transaction);
     }
 
