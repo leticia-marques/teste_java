@@ -15,10 +15,13 @@ public record CompanyResponseDto(
         Long id,
         String name,
 
-        List <TransactionResponseDto> transactions
+        List <TransactionResponseDto> transactions,
+
+        BigDecimal balance
 ) {
     public CompanyResponseDto(Company company) {
-        this(company.getId(), company.getName(), TransactionResponseDto.convertList(company.getTransactions()));
+        this(company.getId(), company.getName(), TransactionResponseDto.convertList(company.getTransactions()),
+                company.getBalance());
     }
 
     public static List<CompanyResponseDto> convertList(Collection<Company> listCompanies){
