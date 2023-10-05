@@ -17,6 +17,7 @@ The Safeway Teste Java Project is a Java-based application that facilitates depo
 Before you begin, make sure you have the following software and tools installed:
 
 - [Java Development Kit (JDK)](https://www.oracle.com/java/technologies/javase-downloads.html)
+- [Docker Compose ](https://docs.docker.com/compose/install/)
 
 ### Installation
 
