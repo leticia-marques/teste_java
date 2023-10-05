@@ -3,7 +3,6 @@ package com.safeway.teste.domain.service.notification;
 
 import com.safeway.teste.domain.dto.notification.EmailDto;
 import com.safeway.teste.domain.dto.notification.Message;
-import com.safeway.teste.domain.dto.notification.MessageDto;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
-import javax.swing.text.AbstractDocument;
 import java.io.IOException;
 
 @Service
@@ -34,17 +32,6 @@ public class EmailNotificationService implements NotificationService{
         this.composeEmail("Movimentação bancária", message.transactionType(),  newEmail);
     }
 
-    public void depositEmail(EmailDto data) {
-        composeEmail("Depósito recebido", "Depósito", data);
-    }
-
-    public void withdrawEmail(EmailDto data) {
-        composeEmail("Saque efetuado com sucesso!", "Saque", data);
-    }
-
-    public void transferEmail(EmailDto data) {
-        composeEmail("Transferência realizada com sucesso!", "Transferência", data);
-    }
 
     private void composeEmail(String subject, String operation, EmailDto data) {
         Email from = new Email(this.email);
