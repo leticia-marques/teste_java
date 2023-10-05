@@ -16,7 +16,7 @@ import com.sendgrid.helpers.mail.objects.Content;
 import javax.swing.text.AbstractDocument;
 import java.io.IOException;
 
-@Service
+//@Service
 public class EmailNotificationService implements NotificationService{
 
 
