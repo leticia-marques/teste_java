@@ -21,6 +21,8 @@ public class EmailNotificationService implements NotificationService{
     @Value("${safeway.teste.notification.email}")
     private String email;
 
+    @Value("${safeway.teste.notification.email-to}")
+    private String emailTo;
     @Value("${safeway.teste.notification.api-key}")
     private String apiKey;
 
@@ -28,7 +30,7 @@ public class EmailNotificationService implements NotificationService{
     @Override
     public void notification(Message message) {
         EmailDto newEmail =  new EmailDto(message.client().getName(), message.transactionValue(),
-                "bc71a578-2756-49dd-900c-d46e9e20c315@email.webhook.site");
+                this.emailTo);
         this.composeEmail("Movimentação bancária", message.transactionType(),  newEmail);
     }
 
