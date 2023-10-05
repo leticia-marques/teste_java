@@ -94,6 +94,9 @@ public class TransactionService {
                 newTransaction.setTotalBalance(lastTransaction.get().getTotalBalance());
                 newTransaction.withdrawWithFee(transactionDto.value().add(valueFee));
                 newTransaction = this.transactionRepository.save(newTransaction);
+                for (NotificationService notification: this.notificationServices) {
+                    notification.notification(new Message("saque", transactionDto.value(), company, client));
+                }
                 return new TransactionResponseDto(newTransaction);
             }
         }
