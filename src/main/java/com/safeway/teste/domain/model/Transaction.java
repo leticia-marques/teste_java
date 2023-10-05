@@ -2,6 +2,7 @@ package com.safeway.teste.domain.model;
 
 import com.safeway.teste.domain.enumarated.TransactionType;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -45,13 +46,20 @@ public class Transaction {
         this.id = id;
     }
 
+    @Transactional
     public void subtractFee(BigDecimal fee) {
         BigDecimal taxFee = this.value.multiply(fee);
         this.value = this.value.subtract(taxFee);
-        this.addTotalBalance(this.value);
     }
 
+    @Transactional
+    public void withdrawWithFee(BigDecimal valueWithFee) {
+        this.totalBalance = this.totalBalance.subtract(valueWithFee);
+    }
+
+    @Transactional
     public void addTotalBalance(BigDecimal balance) {
-        this.totalBalance = this.totalBalance.add(balance);
+        BigDecimal teste = this.totalBalance.add(balance);
+        this.totalBalance = teste;
     }
 }

@@ -82,15 +82,22 @@ public class TransactionService {
     public TransactionResponseDto withdraw(TransactionInputDto transactionDto) {
         Company company = this.companyService.getById(new Company(transactionDto.companyId()));
         Client client =  this.clientService.getById(new Client(transactionDto.clientId()));
+        Optional<Transaction> lastTransaction  = this.getLastTransactionByClientId(transactionDto.clientId(), transactionDto.companyId());
+        BigDecimal valueFee = transactionDto.value().multiply(TRANSACTION_FEE);
 
-        Transaction transaction = new Transaction(client, company, transactionDto.value(), TransactionType.WITHDRAW);
-        this.validateWithDraw(transaction);
-        company.subtractBalance(transaction.getValue().subtract(transactionDto.value().multiply(TRANSACTION_FEE)));
-        transaction = this.transactionRepository.save(transaction);
-        for (NotificationService notification: this.notificationServices) {
-            notification.notification(new Message("saque", transactionDto.value(), company, client));
+        BigDecimal totalValueWithfee = transactionDto.value().subtract(valueFee);
+        if (lastTransaction.isPresent()) {
+            if (transactionDto.value().add(transactionDto.value().multiply(TRANSACTION_FEE)).compareTo(lastTransaction.get().getTotalBalance()) < 1 ) {
+                company.subtractBalance(totalValueWithfee);
+
+                Transaction newTransaction = new Transaction(client, company, transactionDto.value(), TransactionType.WITHDRAW);
+                newTransaction.setTotalBalance(lastTransaction.get().getTotalBalance());
+                newTransaction.withdrawWithFee(transactionDto.value().add(valueFee));
+                newTransaction = this.transactionRepository.save(newTransaction);
+                return new TransactionResponseDto(newTransaction);
+            }
         }
-        return new TransactionResponseDto(transaction);
+        throw new BusinessException("Not enough balance");
     }
 
     public Page<TransactionListDto> search(Pageable pageable) {
@@ -107,27 +114,15 @@ public class TransactionService {
     public Transaction discountFee(Transaction transaction) {
         Optional<Transaction> lastTransaction  = this.getLastTransactionByClientId(transaction.getClient().getId(), transaction.getCompany().getId());
         BigDecimal depositValue = transaction.getValue();
+        BigDecimal depositValueWithFee = depositValue.subtract(depositValue.multiply(TRANSACTION_FEE));
         transaction.getCompany().addBalance(depositValue);
         transaction.getClient().addCompany(transaction.getCompany());
         if (lastTransaction.isPresent()){
             transaction.addTotalBalance(lastTransaction.get().getTotalBalance());
         }
         transaction.subtractFee(TRANSACTION_FEE);
+        transaction.addTotalBalance(depositValueWithFee );
+
         return transaction;
-    }
-
-    public void validateWithDraw(Transaction transaction) {
-        Optional<Transaction> lastTransaction  = this.getLastTransactionByClientId(transaction.getClient().getId(), transaction.getCompany().getId());
-        if (lastTransaction.isPresent()) {
-            BigDecimal valueFee = transaction.getValue().multiply(TRANSACTION_FEE);
-            BigDecimal totalValueWithFee = transaction.getValue().add(valueFee);
-            if (lastTransaction.get().getTotalBalance().compareTo(totalValueWithFee) < 0) {
-                throw new BusinessException("Not enough balance");
-            }
-        }
-        else {
-            throw new TransactionNotFoundException("No deposits made yet");
-        }
-
     }
 }
