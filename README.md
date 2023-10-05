@@ -25,12 +25,15 @@ Before you begin, make sure you have the following software and tools installed:
    ```bash
    git clone https://github.com/leticia-marques/teste_java.git
 
+3. Run docker-compose.yaml
+    ```bash
+    docker compose up -d
 2. Navigate to the project directory:
     ```bash
     cd teste_java
 3. Build the project using Maven:
     ```bash
-    mvn clean install
+    ./mvnw spring-boot:run
 
 ### Usage
 For routes and body params go to http://localhost:8080/swagger-ui/index.html
