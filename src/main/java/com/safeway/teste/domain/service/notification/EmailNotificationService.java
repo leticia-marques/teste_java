@@ -27,6 +27,7 @@ public class EmailNotificationService implements NotificationService{
     private String apiKey;
 
     //TODO configurar recebimento de email do cliente na criação de clienteInputDto
+    // TODO TESTE refatoração melhorar documentação README DOCKER e docker-compose
     @Override
     public void notification(Message message) {
         EmailDto newEmail =  new EmailDto(message.client().getName(), message.transactionValue(),
