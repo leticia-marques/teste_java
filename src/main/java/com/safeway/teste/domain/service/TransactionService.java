@@ -1,13 +1,11 @@
 package com.safeway.teste.domain.service;
 
-import com.safeway.teste.domain.dto.company.CompanyListDto;
 import com.safeway.teste.domain.dto.notification.Message;
 import com.safeway.teste.domain.dto.transaction.TransactionInputDto;
 import com.safeway.teste.domain.dto.transaction.TransactionListDto;
 import com.safeway.teste.domain.dto.transaction.TransactionResponseDto;
 import com.safeway.teste.domain.enumarated.TransactionType;
 import com.safeway.teste.domain.exception.BusinessException;
-import com.safeway.teste.domain.exception.EntityNotFoundException;
 import com.safeway.teste.domain.exception.TransactionNotFoundException;
 import com.safeway.teste.domain.model.Client;
 import com.safeway.teste.domain.model.Company;
@@ -15,17 +13,13 @@ import com.safeway.teste.domain.model.Transaction;
 import com.safeway.teste.domain.repository.TransactionRepository;
 import com.safeway.teste.domain.service.notification.NotificationService;
 import jakarta.transaction.Transactional;
-import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -114,7 +108,7 @@ public class TransactionService {
         Optional<Transaction> lastTransaction  = this.getLastTransactionByClientId(transaction.getClient().getId(), transaction.getCompany().getId());
         BigDecimal depositValue = transaction.getValue();
         transaction.getCompany().addBalance(depositValue);
-        transaction.getClient().addCompanie(transaction.getCompany());
+        transaction.getClient().addCompany(transaction.getCompany());
         if (lastTransaction.isPresent()){
             transaction.addTotalBalance(lastTransaction.get().getTotalBalance());
         }
