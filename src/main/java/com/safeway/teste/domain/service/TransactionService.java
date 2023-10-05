@@ -1,6 +1,7 @@
 package com.safeway.teste.domain.service;
 
 import com.safeway.teste.domain.dto.company.CompanyListDto;
+import com.safeway.teste.domain.dto.notification.Message;
 import com.safeway.teste.domain.dto.transaction.TransactionInputDto;
 import com.safeway.teste.domain.dto.transaction.TransactionListDto;
 import com.safeway.teste.domain.dto.transaction.TransactionResponseDto;
@@ -12,6 +13,7 @@ import com.safeway.teste.domain.model.Client;
 import com.safeway.teste.domain.model.Company;
 import com.safeway.teste.domain.model.Transaction;
 import com.safeway.teste.domain.repository.TransactionRepository;
+import com.safeway.teste.domain.service.notification.NotificationService;
 import jakarta.transaction.Transactional;
 import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -33,13 +38,20 @@ public class TransactionService {
 
     private TransactionRepository transactionRepository;
 
+    private NotificationService notificationService;
+
     @Autowired
-    public TransactionService(CompanyService companyService, ClientService clientService, TransactionRepository transactionRepository) {
+    public TransactionService(CompanyService companyService, ClientService clientService,
+                              TransactionRepository transactionRepository, NotificationService notificationService) {
         this.companyService = companyService;
         this.clientService = clientService;
         this.transactionRepository = transactionRepository;
+        this.notificationService = notificationService;
     }
 
+    public void sendWebHook() {
+
+    }
     @Transactional
     public TransactionResponseDto deposit(TransactionInputDto transactionDto) {
         Company company = this.companyService.getById(new Company(transactionDto.companyId()));
@@ -48,6 +60,7 @@ public class TransactionService {
         Transaction transaction = new Transaction(client, company, transactionDto.value(), TransactionType.DEPOSIT);
         transaction = this.discountFee(transaction);
         transaction = this.transactionRepository.save(transaction);
+        this.notificationService.notification(new Message("deposito", transactionDto.value(), company, client));
         return new TransactionResponseDto(transaction);
     }
 
@@ -80,6 +93,7 @@ public class TransactionService {
         this.validateWithDraw(transaction);
         company.subtractBalance(transaction.getValue().subtract(transactionDto.value().multiply(TRANSACTION_FEE)));
         transaction = this.transactionRepository.save(transaction);
+        this.notificationService.notification(new Message("saque", transactionDto.value(), company, client));
         return new TransactionResponseDto(transaction);
     }
 
@@ -107,7 +121,6 @@ public class TransactionService {
     }
 
     public void validateWithDraw(Transaction transaction) {
-        //TODO subtrair o valor do saque do total da empresa
         Optional<Transaction> lastTransaction  = this.getLastTransactionByClientId(transaction.getClient().getId(), transaction.getCompany().getId());
         if (lastTransaction.isPresent()) {
             BigDecimal valueFee = transaction.getValue().multiply(TRANSACTION_FEE);

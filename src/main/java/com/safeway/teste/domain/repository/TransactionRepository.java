@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+
     @Query("SELECT t FROM Transaction t " +
             "WHERE t.client.id = :clientId " +
             "AND t.company.id = :companyId " +
