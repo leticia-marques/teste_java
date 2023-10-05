@@ -53,7 +53,11 @@ public class Company {
     }
 
     public void addBalance(BigDecimal totalValue) {
-        BigDecimal totalQualquer = this.balance.add(totalValue);
-        this.balance = this.balance.add(totalQualquer);
+        BigDecimal total = this.balance.add(totalValue);
+        this.balance = this.balance.add(total);
+    }
+
+    public void subtractBalance(BigDecimal totalValue){
+        this.balance = this.balance.subtract(totalValue);
     }
 }

@@ -78,6 +78,7 @@ public class TransactionService {
 
         Transaction transaction = new Transaction(client, company, transactionDto.value(), TransactionType.WITHDRAW);
         this.validateWithDraw(transaction);
+        company.subtractBalance(transaction.getValue().subtract(transactionDto.value().multiply(TRANSACTION_FEE)));
         transaction = this.transactionRepository.save(transaction);
         return new TransactionResponseDto(transaction);
     }
