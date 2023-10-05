@@ -2,6 +2,7 @@ package com.safeway.teste.domain.model;
 
 import com.safeway.teste.domain.dto.client.ClientInputDto;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.hibernate.validator.constraints.br.CPF;
 
@@ -26,6 +27,9 @@ public class Client {
     @CPF
     private String cpf;
 
+    @Email
+    private String email;
+
     @ManyToMany
     @JoinTable(name = "client_companies",
     joinColumns = @JoinColumn(name = "clients_id"),
@@ -35,13 +39,14 @@ public class Client {
     public Client(ClientInputDto clientDto) {
         this.cpf = clientDto.cpf();
         this.name = clientDto.name();
+        this.email = clientDto.email();
     }
 
     public Client(Long clientId) {
         this.id = clientId;
     }
 
-    public void addCompanie(Company company) {
+    public void addCompany(Company company) {
         this.companies.add(company);
     }
 }

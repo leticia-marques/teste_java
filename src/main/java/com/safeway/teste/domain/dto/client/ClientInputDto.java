@@ -1,5 +1,6 @@
 package com.safeway.teste.domain.dto.client;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.br.CPF;
 
@@ -10,6 +11,10 @@ public record ClientInputDto(
 
         @NotBlank
         @CPF
-        String cpf
+        String cpf,
+
+        @NotBlank
+        @Email
+        String email
 ) {
 }

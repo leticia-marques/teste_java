@@ -12,10 +12,12 @@ public record ClientResponseDto(
 
         String name,
 
+        String email,
+
         List <CompanyResponseDto> companies
 ) {
     public ClientResponseDto(Client client) {
-        this(client.getId(), client.getName(), CompanyResponseDto.convertList(client.getCompanies()));
+        this(client.getId(), client.getName(), client.getEmail(),CompanyResponseDto.convertList(client.getCompanies()));
     }
 
 
